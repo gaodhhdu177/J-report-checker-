@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel · J-Tools</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f6f7fb;
+  --card: #fff;
+  --text: #0f172a;
+  --muted: #64748b;
+  --line: #e2e8f0;
+  --soft: #f1f5f9;
+  --primary: #4f46e5;
+  --ok: #059669;
+  --bad: #e11d48;
+  --warn: #d97706;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding: 0 0 60px;
+}
+.topbar {
+  background: #0f172a;
+  color: #fff;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.topbar .brand { font-weight: 800; font-size: 16px; letter-spacing: -0.3px; }
+.topbar .brand span { color: #a5b4fc; }
+.topbar .right { display: flex; align-items: center; gap: 12px; font-size: 13.5px; }
+.topbar a {
+  color: #c7d2fe;
+  text-decoration: none;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.08);
+}
+.topbar a:hover { background: rgba(255,255,255,0.14); }
+.btn-out {
+  background: #e11d48 !important;
+  color: #fff !important;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 10px;
+}
+.wrap { max-width: 900px; margin: 0 auto; padding: 28px 16px; }
+h1 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-bottom: 6px;
+  letter-spacing: -0.4px;
+}
+.sub { color: var(--muted); font-size: 14px; margin-bottom: 24px; }
+.cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 28px;
+}
+@media (max-width: 600px) { .cards { grid-template-columns: 1fr; } }
+.stat {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: 0 2px 12px rgba(15,23,42,0.04);
+}
+.stat-v { font-size: 1.7rem; font-weight: 800; }
+.stat-l { font-size: 12px; color: var(--muted); font-weight: 600; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.4px; }
+.section {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  overflow: hidden;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 12px rgba(15,23,42,0.04);
+}
+.section-h {
+  padding: 16px 18px;
+  background: var(--soft);
+  border-bottom: 1px solid var(--line);
+  font-weight: 700;
+  font-size: 14.5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.pill {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 999px;
+  color: #fff;
+}
+.pill-pend { background: var(--warn); }
+.pill-ok { background: var(--ok); }
+.user-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--line);
+  flex-wrap: wrap;
+}
+.user-row:last-child { border-bottom: none; }
+.user-info { flex: 1; min-width: 160px; }
+.user-info .name { font-weight: 700; font-size: 14.5px; }
+.user-info .meta { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn {
+  border: none;
+  border-radius: 10px;
+  padding: 9px 14px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn-ok { background: #ecfdf5; color: var(--ok); border: 1px solid #a7f3d0; }
+.btn-ok:hover { background: #d1fae5; }
+.btn-bad { background: #fff1f2; color: var(--bad); border: 1px solid #fecdd3; }
+.btn-bad:hover { background: #ffe4e6; }
+.empty {
+  padding: 28px 18px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 14px;
+}
+.tools {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 8px;
+}
+@media (max-width: 560px) { .tools { grid-template-columns: 1fr; } }
+.tool-card {
+  display: block;
+  background: linear-gradient(145deg, #eef2ff, #fff);
+  border: 1.5px solid #e0e7ff;
+  border-radius: 16px;
+  padding: 22px 18px;
+  text-decoration: none;
+  color: var(--text);
+  transition: transform 0.15s, box-shadow 0.2s;
+}
+.tool-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(79,70,229,0.12);
+}
+.tool-card h3 { font-size: 16px; font-weight: 800; margin-bottom: 4px; color: #4f46e5; }
+.tool-card p { font-size: 13px; color: var(--muted); }
+.credit {
+  text-align: center;
+  margin-top: 32px;
+  font-size: 12px;
+  color: #94a3b8;
+}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="brand">J-<span>Admin</span> Panel</div>
+  <div class="right">
+    <span id="adminName">Admin</span>
+    <a href="dashboard.html">Tools</a>
+    <button class="btn-out" id="logoutBtn">Logout</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <h1>Admin Dashboard</h1>
+  <p class="sub">Approve users and manage access to J-Tools</p>
+
+  <div class="cards">
+    <div class="stat">
+      <div class="stat-v" id="cTotal">0</div>
+      <div class="stat-l">Total Users</div>
+    </div>
+    <div class="stat">
+      <div class="stat-v" id="cPending" style="color:#d97706">0</div>
+      <div class="stat-l">Pending</div>
+    </div>
+    <div class="stat">
+      <div class="stat-v" id="cApproved" style="color:#059669">0</div>
+      <div class="stat-l">Approved</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-h">
+      Pending Approvals
+      <span class="pill pill-pend" id="pendBadge">0</span>
+    </div>
+    <div id="pendingList"><div class="empty">No pending users</div></div>
+  </div>
+
+  <div class="section">
+    <div class="section-h">
+      Approved Users
+      <span class="pill pill-ok" id="okBadge">0</span>
+    </div>
+    <div id="approvedList"><div class="empty">No approved users yet</div></div>
+  </div>
+
+  <h1 style="margin-top:28px;font-size:1.2rem">Quick access tools</h1>
+  <div class="tools">
+    <a class="tool-card" href="j-report-checker.html">
+      <h3>J-report checker</h3>
+      <p>Email report &amp; price calculator</p>
+    </a>
+    <a class="tool-card" href="j-duplicate-checker.html">
+      <h3>J-duplicate checker</h3>
+      <p>Find &amp; clean duplicate emails</p>
+    </a>
+  </div>
+
+  <p class="credit">developed by gourab bro</p>
+</div>
+
+<script>
+(function guard(){
+  var s = null;
+  try { s = JSON.parse(localStorage.getItem('j_tools_session') || 'null'); } catch(e){}
+  if (!s || s.role !== 'admin') {
+    location.replace('index.html');
+    return;
+  }
+  document.getElementById('adminName').textContent = s.name || s.email;
+})();
+
+document.getElementById('logoutBtn').onclick = function(){
+  localStorage.removeItem('j_tools_session');
+  location.href = 'index.html';
+};
+
+function getUsers(){
+  try { return JSON.parse(localStorage.getItem('j_tools_users') || '[]'); } catch(e){ return []; }
+}
+function saveUsers(list){
+  localStorage.setItem('j_tools_users', JSON.stringify(list));
+}
+
+function render(){
+  var users = getUsers().filter(function(u){ return u.role !== 'admin'; });
+  var pending = users.filter(function(u){ return u.status === 'pending'; });
+  var approved = users.filter(function(u){ return u.status === 'approved'; });
+
+  document.getElementById('cTotal').textContent = users.length;
+  document.getElementById('cPending').textContent = pending.length;
+  document.getElementById('cApproved').textContent = approved.length;
+  document.getElementById('pendBadge').textContent = pending.length;
+  document.getElementById('okBadge').textContent = approved.length;
+
+  var pl = document.getElementById('pendingList');
+  if (!pending.length) {
+    pl.innerHTML = '<div class="empty">No pending users</div>';
+  } else {
+    pl.innerHTML = pending.map(function(u){
+      return '<div class="user-row">' +
+        '<div class="user-info"><div class="name">' + esc(u.name || '—') + '</div>' +
+        '<div class="meta">' + esc(u.email) + ' · ' + formatDate(u.createdAt) + '</div></div>' +
+        '<div class="actions">' +
+        '<button class="btn btn-ok" data-id="' + u.id + '" data-act="approve">Approve</button>' +
+        '<button class="btn btn-bad" data-id="' + u.id + '" data-act="reject">Reject</button>' +
+        '</div></div>';
+    }).join('');
+  }
+
+  var al = document.getElementById('approvedList');
+  if (!approved.length) {
+    al.innerHTML = '<div class="empty">No approved users yet</div>';
+  } else {
+    al.innerHTML = approved.map(function(u){
+      return '<div class="user-row">' +
+        '<div class="user-info"><div class="name">' + esc(u.name || '—') + '</div>' +
+        '<div class="meta">' + esc(u.email) + ' · ' + formatDate(u.createdAt) + '</div></div>' +
+        '<div class="actions">' +
+        '<button class="btn btn-bad" data-id="' + u.id + '" data-act="revoke">Revoke</button>' +
+        '</div></div>';
+    }).join('');
+  }
+
+  document.querySelectorAll('[data-act]').forEach(function(btn){
+    btn.onclick = function(){
+      var id = btn.getAttribute('data-id');
+      var act = btn.getAttribute('data-act');
+      var list = getUsers();
+      var idx = list.findIndex(function(u){ return u.id === id; });
+      if (idx < 0) return;
+      if (act === 'approve') list[idx].status = 'approved';
+      if (act === 'reject' || act === 'revoke') {
+        if (act === 'reject') list.splice(idx, 1);
+        else list[idx].status = 'pending';
+      }
+      saveUsers(list);
+      render();
+    };
+  });
+}
+
+function esc(s){
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function formatDate(iso){
+  if (!iso) return '';
+  try { return new Date(iso).toLocaleString(); } catch(e){ return iso; }
+}
+
+render();
+</script>
+</body>
+</html>

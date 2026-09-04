@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard · J-Tools</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f6f7fb;
+  --card: #fff;
+  --text: #0f172a;
+  --muted: #64748b;
+  --line: #e2e8f0;
+  --primary: #4f46e5;
+  --teal: #0d9488;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding: 0 0 60px;
+  background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(79,70,229,0.08), transparent);
+}
+.topbar {
+  background: #fff;
+  border-bottom: 1px solid var(--line);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.brand {
+  font-weight: 800;
+  font-size: 17px;
+  letter-spacing: -0.3px;
+}
+.brand span { color: var(--primary); }
+.right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13.5px;
+  color: var(--muted);
+}
+.btn-out {
+  background: #fff1f2;
+  color: #e11d48;
+  border: 1px solid #fecdd3;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 10px;
+}
+.wrap { max-width: 800px; margin: 0 auto; padding: 36px 16px; }
+h1 {
+  font-size: clamp(1.5rem, 4vw, 1.9rem);
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  margin-bottom: 8px;
+}
+.sub { color: var(--muted); font-size: 15px; margin-bottom: 32px; }
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+@media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
+.tool {
+  display: block;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 28px 24px;
+  text-decoration: none;
+  color: var(--text);
+  box-shadow: 0 4px 20px rgba(15,23,42,0.05);
+  transition: transform 0.15s, box-shadow 0.2s;
+}
+.tool:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(15,23,42,0.1);
+}
+.tool-icon {
+  width: 48px; height: 48px;
+  border-radius: 14px;
+  display: grid; place-items: center;
+  font-weight: 800; font-size: 18px; color: #fff;
+  margin-bottom: 16px;
+}
+.tool:nth-child(1) .tool-icon { background: linear-gradient(135deg, #4f46e5, #6366f1); }
+.tool:nth-child(2) .tool-icon { background: linear-gradient(135deg, #0d9488, #14b8a6); }
+.tool h2 { font-size: 1.15rem; font-weight: 800; margin-bottom: 6px; }
+.tool p { font-size: 13.5px; color: var(--muted); line-height: 1.5; }
+.admin-link {
+  display: none;
+  margin-top: 24px;
+  text-align: center;
+}
+.admin-link a {
+  color: var(--primary);
+  font-weight: 600;
+  text-decoration: none;
+  font-size: 14px;
+}
+.credit {
+  text-align: center;
+  margin-top: 40px;
+  font-size: 12px;
+  color: #94a3b8;
+}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="brand">J-<span>Tools</span></div>
+  <div class="right">
+    <span id="userLabel">User</span>
+    <button class="btn-out" id="logoutBtn">Logout</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <h1>Dashboard</h1>
+  <p class="sub">Choose a tool to continue</p>
+
+  <div class="grid">
+    <a class="tool" href="j-report-checker.html">
+      <div class="tool-icon">R</div>
+      <h2>J-report checker</h2>
+      <p>Generate email reports with BDT &amp; USDT price calculation</p>
+    </a>
+    <a class="tool" href="j-duplicate-checker.html">
+      <div class="tool-icon">D</div>
+      <h2>J-duplicate checker</h2>
+      <p>Find and remove duplicate emails — passwords stay safe</p>
+    </a>
+  </div>
+
+  <div class="admin-link" id="adminLink">
+    <a href="admin.html">→ Open Admin Panel</a>
+  </div>
+
+  <p class="credit">developed by gourab bro</p>
+</div>
+
+<script>
+(function guard(){
+  var s = null;
+  try { s = JSON.parse(localStorage.getItem('j_tools_session') || 'null'); } catch(e){}
+  if (!s || !s.email) {
+    location.replace('index.html');
+    return;
+  }
+  if (s.role !== 'admin' && s.status !== 'approved') {
+    localStorage.removeItem('j_tools_session');
+    location.replace('index.html');
+    return;
+  }
+  document.getElementById('userLabel').textContent = s.name || s.email;
+  if (s.role === 'admin') {
+    document.getElementById('adminLink').style.display = 'block';
+  }
+})();
+
+document.getElementById('logoutBtn').onclick = function(){
+  localStorage.removeItem('j_tools_session');
+  location.href = 'index.html';
+};
+</script>
+</body>
+</html>

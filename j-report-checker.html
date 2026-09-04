@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>J-report checker</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f6f7fb;
+  --card: #ffffff;
+  --text: #0f172a;
+  --muted: #64748b;
+  --line: #e2e8f0;
+  --soft: #f1f5f9;
+  --primary: #4f46e5;
+  --primary-soft: #eef2ff;
+  --primary-dark: #3730a3;
+  --ok: #059669;
+  --ok-bg: #ecfdf5;
+  --bad: #e11d48;
+  --bad-bg: #fff1f2;
+  --warn: #d97706;
+  --warn-bg: #fffbeb;
+  --shadow: 0 4px 24px rgba(15, 23, 42, 0.06);
+  --radius: 20px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding: 32px 20px 80px;
+  background-image:
+    radial-gradient(ellipse 90% 60% at 50% -20%, rgba(79,70,229,0.09), transparent),
+    radial-gradient(ellipse 50% 40% at 100% 100%, rgba(99,102,241,0.05), transparent);
+}
+.wrap { max-width: 920px; margin: 0 auto; }
+
+/* Header */
+.header {
+  text-align: center;
+  margin-bottom: 36px;
+}
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--primary-soft);
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  margin-bottom: 16px;
+}
+.header h1 {
+  font-size: clamp(1.9rem, 5vw, 2.6rem);
+  font-weight: 800;
+  letter-spacing: -1px;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.15;
+}
+.header h1 span { color: var(--primary); }
+.header p {
+  font-size: 15.5px;
+  color: var(--muted);
+  font-weight: 500;
+  max-width: 420px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+/* Main card */
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(226,232,240,0.8);
+  padding: 36px 32px;
+  margin-bottom: 24px;
+}
+@media (max-width: 640px) {
+  .card { padding: 24px 18px; }
+  body { padding: 24px 14px 70px; }
+}
+
+.section {
+  margin-bottom: 28px;
+}
+.section:last-of-type { margin-bottom: 0; }
+
+.label {
+  display: block;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 10px;
+}
+.label .req { color: var(--bad); margin-left: 2px; }
+
+.grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+@media (max-width: 700px) {
+  .grid2 { grid-template-columns: 1fr; }
+}
+
+input[type="text"],
+input[type="number"] {
+  width: 100%;
+  padding: 15px 16px;
+  border: 1.5px solid var(--line);
+  border-radius: 14px;
+  background: var(--soft);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text);
+  transition: border 0.2s, box-shadow 0.2s, background 0.2s;
+}
+input:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(79,70,229,0.12);
+}
+
+/* Price block */
+.price-block {
+  background: linear-gradient(145deg, #f8fafc 0%, #eef2ff 100%);
+  border: 1.5px solid #e0e7ff;
+  border-radius: 18px;
+  padding: 22px;
+}
+.price-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.price-tabs button {
+  flex: 1;
+  padding: 11px 14px;
+  border: 1.5px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.price-tabs button.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(79,70,229,0.3);
+}
+.price-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+@media (max-width: 500px) {
+  .price-fields { grid-template-columns: 1fr; }
+}
+.price-fields label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.price-fields input {
+  background: #fff;
+}
+.conv-hint {
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 500;
+  text-align: center;
+}
+
+/* Textareas */
+.ta-wrap {
+  border: 1.5px solid var(--line);
+  border-radius: 16px;
+  background: var(--soft);
+  overflow: hidden;
+  transition: border 0.2s, box-shadow 0.2s, background 0.2s;
+}
+.ta-wrap:focus-within {
+  border-color: var(--primary);
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(79,70,229,0.12);
+}
+textarea {
+  width: 100%;
+  border: none;
+  outline: none;
+  resize: none;
+  background: transparent;
+  padding: 16px;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--text);
+}
+.main-ta {
+  height: 180px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.out-ta {
+  height: 150px;
+  white-space: pre;
+  overflow-x: auto;
+  word-break: keep-all;
+}
+
+.btn-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 600;
+  border-radius: 12px;
+  transition: transform 0.15s, box-shadow 0.2s, background 0.2s, opacity 0.2s;
+}
+.btn:active { transform: scale(0.97); }
+
+.btn-sm {
+  flex: 1;
+  padding: 11px 14px;
+  font-size: 13.5px;
+  background: #fff;
+  color: var(--text);
+  border: 1.5px solid var(--line);
+}
+.btn-sm:hover { background: var(--soft); border-color: #cbd5e1; }
+.btn-clear {
+  color: var(--bad);
+  background: var(--bad-bg);
+  border-color: #fecdd3;
+}
+.btn-clear:hover { background: #ffe4e6; }
+
+.btn-primary {
+  width: 100%;
+  margin-top: 8px;
+  padding: 17px 24px;
+  font-size: 16px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #4f46e5, #6366f1);
+  color: #fff;
+  box-shadow: 0 10px 28px rgba(79,70,229,0.35);
+  border-radius: 14px;
+}
+.btn-primary:hover {
+  box-shadow: 0 14px 32px rgba(79,70,229,0.42);
+  opacity: 0.96;
+}
+
+/* Message */
+.msg {
+  display: none;
+  margin-top: 16px;
+  padding: 14px 18px;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 500;
+  align-items: center;
+  gap: 10px;
+}
+.msg.show { display: flex; }
+.msg.ok { background: var(--ok-bg); color: var(--ok); border: 1px solid #a7f3d0; }
+.msg.err { background: var(--bad-bg); color: var(--bad); border: 1px solid #fecdd3; }
+
+/* Results */
+.results { display: none; margin-top: 32px; }
+.result-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 12px rgba(15,23,42,0.04);
+}
+.result-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  background: var(--soft);
+  border-bottom: 1px solid var(--line);
+}
+.result-title {
+  font-weight: 700;
+  font-size: 14.5px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.pill {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 11px;
+  border-radius: 999px;
+  color: #fff;
+}
+.pill-found { background: var(--bad); }
+.pill-good { background: var(--ok); }
+.pill-unknown { background: var(--warn); }
+.btn-copy {
+  padding: 8px 14px;
+  font-size: 13px;
+  background: #fff;
+  color: var(--muted);
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+}
+.btn-copy:hover {
+  color: var(--primary);
+  border-color: var(--primary);
+  background: var(--primary-soft);
+}
+.result-body { padding: 14px; }
+
+.btn-summary {
+  width: 100%;
+  padding: 15px;
+  font-size: 15px;
+  font-weight: 700;
+  background: var(--text);
+  color: #fff;
+  border-radius: 14px;
+  margin-top: 4px;
+}
+.btn-summary:hover { opacity: 0.9; }
+
+/* Modal */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(8px);
+  z-index: 100;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.overlay.show { display: flex; }
+.modal {
+  background: #fff;
+  border-radius: 24px;
+  width: 100%;
+  max-width: 440px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 25px 50px rgba(0,0,0,0.18);
+}
+.modal-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--line);
+}
+.modal-head h3 {
+  font-size: 17px;
+  font-weight: 700;
+}
+.close-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: var(--bad-bg);
+  color: var(--bad);
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+.modal-body { padding: 24px; }
+.modal-body h4 {
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+.modal-body h4 span { color: var(--primary); }
+.modal-date {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 20px;
+}
+table { width: 100%; border-collapse: collapse; }
+td {
+  padding: 13px 0;
+  border-bottom: 1px dashed var(--line);
+  font-size: 14.5px;
+}
+td:last-child { text-align: right; font-weight: 700; }
+tr:last-child td { border-bottom: none; }
+.pay-row td {
+  color: var(--primary);
+  font-size: 15.5px;
+  padding-top: 16px;
+}
+.modal-foot {
+  padding: 16px 24px;
+  border-top: 1px solid var(--line);
+  background: var(--soft);
+  font-size: 13px;
+  color: var(--muted);
+  border-radius: 0 0 24px 24px;
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  margin-top: 40px;
+  font-size: 13px;
+  color: #94a3b8;
+  font-weight: 500;
+}
+</style>
+</head>
+<body>
+
+<script>
+(function(){
+  var s = null;
+  try { s = JSON.parse(localStorage.getItem('j_tools_session') || 'null'); } catch(e){}
+  if (!s || !s.email) { location.replace('index.html'); return; }
+  if (s.role !== 'admin' && s.status !== 'approved') {
+    localStorage.removeItem('j_tools_session');
+    location.replace('index.html');
+    return;
+  }
+})();
+</script>
+
+<div id="j-topbar" style="position:sticky;top:0;z-index:50;background:#0f172a;color:#fff;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;font-family:Inter,system-ui,sans-serif;font-size:13.5px;font-weight:600">
+  <a href="dashboard.html" style="color:#c7d2fe;text-decoration:none">← Dashboard</a>
+  <span style="opacity:.7;font-weight:500">J-report checker</span>
+  <button onclick="localStorage.removeItem('j_tools_session');location.href='index.html'" style="background:#e11d48;color:#fff;border:none;padding:7px 12px;border-radius:8px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">Logout</button>
+</div>
+
+<div class="wrap">
+  <div class="header">
+    <div class="badge">✦ PREMIUM TOOL</div>
+    <h1>J-<span>report</span> checker</h1>
+    <p>Generate detailed email reports with automatic BDT &amp; USDT price calculation</p>
+  </div>
+
+  <div class="card">
+    <!-- Names -->
+    <div class="section">
+      <div class="grid2">
+        <div>
+          <label class="label">Buyer Name <span class="req">*</span></label>
+          <input type="text" id="buyerName" placeholder="Enter buyer name">
+        </div>
+        <div>
+          <label class="label">Seller Name <span class="req">*</span></label>
+          <input type="text" id="sellerName" placeholder="Enter seller name">
+        </div>
+      </div>
+    </div>
+
+    <!-- Price -->
+    <div class="section">
+      <label class="label">Base Price <span class="req">*</span></label>
+      <div class="price-block">
+        <div class="price-tabs">
+          <button type="button" class="active" id="tabBdt">BDT</button>
+          <button type="button" id="tabUsdt">USDT</button>
+        </div>
+        <div class="price-fields">
+          <div>
+            <label>Amount in BDT</label>
+            <input type="number" id="basePriceBdt" placeholder="0.00" min="0" step="0.01">
+          </div>
+          <div>
+            <label>Amount in USDT</label>
+            <input type="number" id="basePriceUsdt" placeholder="0.0000" min="0" step="0.0001">
+          </div>
+        </div>
+        <div class="conv-hint">1 USDT = 126 BDT · type in either field — auto converts</div>
+      </div>
+    </div>
+
+    <!-- Email lists -->
+    <div class="section">
+      <div class="grid2">
+        <div>
+          <label class="label">Main Email List <span class="req">*</span></label>
+          <div class="ta-wrap">
+            <textarea id="mainEmails" class="main-ta" placeholder="email@gmail.com&#9;password&#9;recovery&#9;VERIFY"></textarea>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-sm" id="pasteMain">Paste</button>
+            <button class="btn btn-sm btn-clear" id="clearMain">Clear</button>
+          </div>
+        </div>
+        <div>
+          <label class="label">Report Email List <span class="req">*</span></label>
+          <div class="ta-wrap">
+            <textarea id="reportEmails" class="main-ta" placeholder="email@gmail.com&#9;password&#9;recovery&#9;VERIFY"></textarea>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-sm" id="pasteReport">Paste</button>
+            <button class="btn btn-sm btn-clear" id="clearReport">Clear</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" id="generateBtn">Generate Report</button>
+    <div class="msg" id="messageBox"></div>
+
+    <!-- Results -->
+    <div class="results" id="resultsSection">
+      <div class="result-card">
+        <div class="result-head">
+          <div class="result-title">Report Found <span class="pill pill-found" id="foundCount">0</span></div>
+          <button class="btn btn-copy" id="copyFound">Copy</button>
+        </div>
+        <div class="result-body">
+          <div class="ta-wrap"><textarea id="outputFound" class="out-ta" readonly placeholder="None"></textarea></div>
+        </div>
+      </div>
+      <div class="result-card">
+        <div class="result-head">
+          <div class="result-title">Report Good <span class="pill pill-good" id="goodCount">0</span></div>
+          <button class="btn btn-copy" id="copyGood">Copy</button>
+        </div>
+        <div class="result-body">
+          <div class="ta-wrap"><textarea id="outputGood" class="out-ta" readonly placeholder="None"></textarea></div>
+        </div>
+      </div>
+      <div class="result-card" id="unknownBox" style="display:none">
+        <div class="result-head">
+          <div class="result-title">Report Unknown <span class="pill pill-unknown" id="unknownCount">0</span></div>
+          <button class="btn btn-copy" id="copyUnknown">Copy</button>
+        </div>
+        <div class="result-body">
+          <div class="ta-wrap"><textarea id="outputUnknown" class="out-ta" readonly placeholder="None"></textarea></div>
+        </div>
+      </div>
+      <button class="btn btn-summary" id="showSummaryBtn">View Full Summary</button>
+    </div>
+  </div>
+
+  <div class="footer">developed by gourab bro</div>
+</div>
+
+<!-- Summary Modal -->
+<div class="overlay" id="summaryModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Report Summary</h3>
+      <button class="close-btn" id="closeModal">×</button>
+    </div>
+    <div class="modal-body">
+      <h4>Report For: <span id="modalSeller"></span></h4>
+      <div class="modal-date">Created on: <span id="modalDate"></span></div>
+      <table>
+        <tr><td>Total Email</td><td id="modalTotal">0</td></tr>
+        <tr><td>Report Good</td><td id="modalGood">0</td></tr>
+        <tr><td>Report Found</td><td id="modalFound">0</td></tr>
+        <tr><td>Report Unknown</td><td id="modalUnknown">0</td></tr>
+        <tr><td>Price / unit</td><td id="modalCalc">—</td></tr>
+        <tr class="pay-row"><td>Payment (BDT)</td><td id="modalPayment">0.00 BDT</td></tr>
+        <tr class="pay-row"><td>Payment (USDT)</td><td id="modalPaymentUsd">0.00 USDT</td></tr>
+      </table>
+    </div>
+    <div class="modal-foot">
+      Report by <strong id="modalBuyerFooter" style="color:#4f46e5">[Buyer]</strong> · J-report checker
+    </div>
+  </div>
+</div>
+
+<script>
+const RATE = 126;
+const buyerName = document.getElementById('buyerName');
+const sellerName = document.getElementById('sellerName');
+const basePriceBdt = document.getElementById('basePriceBdt');
+const basePriceUsdt = document.getElementById('basePriceUsdt');
+const mainEmails = document.getElementById('mainEmails');
+const reportEmails = document.getElementById('reportEmails');
+const generateBtn = document.getElementById('generateBtn');
+const messageBox = document.getElementById('messageBox');
+const resultsSection = document.getElementById('resultsSection');
+const foundCount = document.getElementById('foundCount');
+const goodCount = document.getElementById('goodCount');
+const unknownCount = document.getElementById('unknownCount');
+const outputFound = document.getElementById('outputFound');
+const outputGood = document.getElementById('outputGood');
+const outputUnknown = document.getElementById('outputUnknown');
+const unknownBox = document.getElementById('unknownBox');
+const summaryModal = document.getElementById('summaryModal');
+const showSummaryBtn = document.getElementById('showSummaryBtn');
+const closeModal = document.getElementById('closeModal');
+let lastResult = null;
+let syncLock = false;
+
+basePriceBdt.addEventListener('input', () => {
+  if (syncLock) return;
+  syncLock = true;
+  const v = parseFloat(basePriceBdt.value);
+  if (!isNaN(v) && v >= 0) basePriceUsdt.value = (v / RATE).toFixed(4);
+  else if (basePriceBdt.value === '') basePriceUsdt.value = '';
+  syncLock = false;
+  setTab('bdt');
+});
+basePriceUsdt.addEventListener('input', () => {
+  if (syncLock) return;
+  syncLock = true;
+  const v = parseFloat(basePriceUsdt.value);
+  if (!isNaN(v) && v >= 0) basePriceBdt.value = (v * RATE).toFixed(2);
+  else if (basePriceUsdt.value === '') basePriceBdt.value = '';
+  syncLock = false;
+  setTab('usdt');
+});
+document.getElementById('tabBdt').onclick = () => { setTab('bdt'); basePriceBdt.focus(); };
+document.getElementById('tabUsdt').onclick = () => { setTab('usdt'); basePriceUsdt.focus(); };
+function setTab(which) {
+  document.getElementById('tabBdt').classList.toggle('active', which === 'bdt');
+  document.getElementById('tabUsdt').classList.toggle('active', which === 'usdt');
+}
+
+function normalizeLine(line) {
+  var s = String(line || '').replace(/\r\n/g, ' ').replace(/[\r\n]+/g, ' ').trim();
+  if (!s) return '';
+  if (s.indexOf('\t') >= 0) return s.split(/\t+/).map(function(p){ return p.trim(); }).filter(Boolean).join('\t');
+  var parts = s.split(/\s{2,}|[|]+/).map(function(p){ return p.trim(); }).filter(Boolean);
+  if (parts.length >= 2) return parts.join('\t');
+  var m = s.match(/^(\S*@\S+)\s+(.+)$/);
+  if (m) return m[1] + '\t' + m[2];
+  return s;
+}
+function mergeBrokenLines(raw) {
+  var lines = String(raw || '').split(/\r?\n/), out = [], buf = '';
+  function hasEmail(s){ return /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i.test(s||''); }
+  for (var i=0;i<lines.length;i++){
+    var t = lines[i].trim();
+    if (!t) continue;
+    if (hasEmail(t)){ if(buf) out.push(buf); buf = t; }
+    else { if(buf) buf = buf + '  ' + t; else buf = t; }
+  }
+  if (buf) out.push(buf);
+  return out.map(normalizeLine).filter(Boolean);
+}
+function formatNumberedLines(lines) {
+  if (!lines || !lines.length) return 'None';
+  var w = String(lines.length).length;
+  return lines.map(function(line,i){
+    var num = String(i+1); while(num.length<w) num=' '+num;
+    return num + '  ' + normalizeLine(line).replace(/\t/g,'   ');
+  }).join('\n');
+}
+function formatCopyLines(lines) {
+  if (!lines || !lines.length) return '';
+  return lines.map(function(line){ return normalizeLine(line); }).filter(Boolean).join('\n');
+}
+function stripLineNumbers(text) {
+  if (!text || text === 'None') return '';
+  return text.split(/\r?\n/).map(function(line){
+    return line.replace(/^\s*\d+[\).:\-\s]+/,'').trim();
+  }).filter(Boolean).join('\n');
+}
+function extractEmail(line) {
+  var m = String(line||'').trim().match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i);
+  return m ? m[0].toLowerCase() : null;
+}
+
+document.getElementById('pasteMain').onclick = async () => {
+  try { mainEmails.value = await navigator.clipboard.readText(); showMessage('Main list pasted!','ok'); }
+  catch { showMessage('Clipboard access failed.','err'); }
+};
+document.getElementById('pasteReport').onclick = async () => {
+  try { reportEmails.value = await navigator.clipboard.readText(); showMessage('Report list pasted!','ok'); }
+  catch { showMessage('Clipboard access failed.','err'); }
+};
+document.getElementById('clearMain').onclick = () => mainEmails.value = '';
+document.getElementById('clearReport').onclick = () => reportEmails.value = '';
+
+generateBtn.addEventListener('click', () => {
+  const buyer = buyerName.value.trim();
+  const seller = sellerName.value.trim();
+  const priceBdt = parseFloat(basePriceBdt.value);
+  const priceUsdt = parseFloat(basePriceUsdt.value);
+  const mainRaw = mainEmails.value.trim();
+  const reportRaw = reportEmails.value.trim();
+
+  if (!buyer) return showMessage('Please enter Buyer Name.','err');
+  if (!seller) return showMessage('Please enter Seller Name.','err');
+  if ((isNaN(priceBdt) || priceBdt < 0) && (isNaN(priceUsdt) || priceUsdt < 0))
+    return showMessage('Please enter a valid base price (BDT or USDT).','err');
+  if (!mainRaw) return showMessage('Please enter Main Email List.','err');
+  if (!reportRaw) return showMessage('Please enter Report Email List.','err');
+
+  let unitBdt = !isNaN(priceBdt) && priceBdt >= 0 ? priceBdt : (priceUsdt * RATE);
+  let unitUsdt = !isNaN(priceUsdt) && priceUsdt >= 0 ? priceUsdt : (unitBdt / RATE);
+
+  const mainLines = mergeBrokenLines(mainRaw);
+  const mainMap = new Map(), mainOrder = [];
+  mainLines.forEach(line => {
+    const email = extractEmail(line);
+    if (email) { mainMap.set(email, normalizeLine(line)); mainOrder.push(email); }
+  });
+  const reportLines = mergeBrokenLines(reportRaw);
+  const reportSet = new Set(), reportMap = new Map();
+  reportLines.forEach(line => {
+    const email = extractEmail(line);
+    if (email) { reportSet.add(email); reportMap.set(email, normalizeLine(line)); }
+  });
+  const found = [], good = [], unknown = [];
+  function fuller(a,b){
+    a = normalizeLine(a||''); b = normalizeLine(b||'');
+    if(!a) return b; if(!b) return a;
+    return b.length > a.length ? b : a;
+  }
+  mainOrder.forEach(email => {
+    const ml = mainMap.get(email);
+    if (reportSet.has(email)) found.push(fuller(ml, reportMap.get(email)));
+    else good.push(ml);
+  });
+  reportSet.forEach(email => {
+    if (!mainMap.has(email)) unknown.push(reportMap.get(email) || email);
+  });
+
+  foundCount.textContent = found.length;
+  goodCount.textContent = good.length;
+  unknownCount.textContent = unknown.length;
+  outputFound.value = formatNumberedLines(found);
+  outputGood.value = formatNumberedLines(good);
+  outputUnknown.value = formatNumberedLines(unknown);
+  unknownBox.style.display = unknown.length > 0 ? 'block' : 'none';
+  resultsSection.style.display = 'block';
+
+  const payBdt = (good.length * unitBdt).toFixed(2);
+  const payUsdt = (good.length * unitUsdt).toFixed(4);
+
+  lastResult = {
+    buyer, seller, unitBdt, unitUsdt,
+    total: mainMap.size,
+    found: found.length, good: good.length, unknown: unknown.length,
+    payment: payBdt, paymentUsd: payUsdt,
+    foundLines: found.slice(), goodLines: good.slice(), unknownLines: unknown.slice()
+  };
+  showMessage('Report generated! Found: ' + found.length + ' | Good: ' + good.length, 'ok');
+});
+
+document.getElementById('copyFound').onclick = function(){
+  var text = (lastResult && lastResult.foundLines) ? formatCopyLines(lastResult.foundLines) : stripLineNumbers(outputFound.value);
+  copyText(text,'Found');
+};
+document.getElementById('copyGood').onclick = function(){
+  var text = (lastResult && lastResult.goodLines) ? formatCopyLines(lastResult.goodLines) : stripLineNumbers(outputGood.value);
+  copyText(text,'Good');
+};
+document.getElementById('copyUnknown').onclick = function(){
+  var text = (lastResult && lastResult.unknownLines) ? formatCopyLines(lastResult.unknownLines) : stripLineNumbers(outputUnknown.value);
+  copyText(text,'Unknown');
+};
+function copyText(text, label){
+  if (!text || text === 'None') return showMessage('Nothing to copy.','err');
+  text = stripLineNumbers(text);
+  if (!text) return showMessage('Nothing to copy.','err');
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(function(){ showMessage(label + ' copied!','ok'); })
+      .catch(function(){ fallbackCopy(text,label); });
+  } else fallbackCopy(text,label);
+}
+function fallbackCopy(text, label){
+  var ta = document.createElement('textarea');
+  ta.value = text; ta.setAttribute('readonly','');
+  ta.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;opacity:0';
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  try {
+    var ok = document.execCommand('copy');
+    showMessage(ok ? (label + ' copied!') : 'Copy failed.','ok');
+  } catch(e){ showMessage('Copy failed.','err'); }
+  document.body.removeChild(ta);
+}
+
+showSummaryBtn.addEventListener('click', () => {
+  if (!lastResult) return;
+  document.getElementById('modalSeller').textContent = lastResult.seller;
+  document.getElementById('modalBuyerFooter').textContent = lastResult.buyer;
+  document.getElementById('modalDate').textContent = new Date().toLocaleString();
+  document.getElementById('modalTotal').textContent = lastResult.total;
+  document.getElementById('modalGood').textContent = lastResult.good;
+  document.getElementById('modalFound').textContent = lastResult.found;
+  document.getElementById('modalUnknown').textContent = lastResult.unknown;
+  document.getElementById('modalCalc').textContent =
+    lastResult.good + ' × ' + lastResult.unitBdt.toFixed(2) + ' BDT  /  ' + lastResult.unitUsdt.toFixed(4) + ' USDT';
+  document.getElementById('modalPayment').textContent = lastResult.payment + ' BDT';
+  document.getElementById('modalPaymentUsd').textContent = lastResult.paymentUsd + ' USDT';
+  summaryModal.classList.add('show');
+});
+closeModal.addEventListener('click', () => summaryModal.classList.remove('show'));
+summaryModal.addEventListener('click', e => { if (e.target === summaryModal) summaryModal.classList.remove('show'); });
+
+function showMessage(text, type){
+  messageBox.className = 'msg show ' + (type === 'ok' ? 'ok' : 'err');
+  messageBox.textContent = text;
+  clearTimeout(window.msgTimeout);
+  window.msgTimeout = setTimeout(() => messageBox.classList.remove('show'), 4000);
+}
+</script>
+</body>
+</html>

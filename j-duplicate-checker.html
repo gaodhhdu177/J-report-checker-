@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>J-duplicate checker</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f7fa;
+  --card: #ffffff;
+  --text: #0f172a;
+  --muted: #64748b;
+  --line: #e2e8f0;
+  --soft: #f1f5f9;
+  --primary: #0d9488;
+  --primary-soft: #f0fdfa;
+  --primary-dark: #0f766e;
+  --ok: #059669;
+  --ok-bg: #ecfdf5;
+  --bad: #e11d48;
+  --bad-bg: #fff1f2;
+  --info: #0284c7;
+  --info-bg: #f0f9ff;
+  --shadow: 0 4px 24px rgba(15, 23, 42, 0.06);
+  --radius: 20px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding: 32px 20px 80px;
+  background-image:
+    radial-gradient(ellipse 90% 55% at 50% -15%, rgba(13,148,136,0.1), transparent),
+    radial-gradient(ellipse 45% 35% at 100% 100%, rgba(20,184,166,0.06), transparent);
+}
+.wrap { max-width: 880px; margin: 0 auto; }
+
+.header {
+  text-align: center;
+  margin-bottom: 36px;
+}
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--primary-soft);
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  margin-bottom: 16px;
+}
+.header h1 {
+  font-size: clamp(1.9rem, 5vw, 2.5rem);
+  font-weight: 800;
+  letter-spacing: -1px;
+  margin-bottom: 10px;
+  line-height: 1.15;
+}
+.header h1 span { color: var(--primary); }
+.header p {
+  font-size: 15.5px;
+  color: var(--muted);
+  font-weight: 500;
+  max-width: 400px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(226,232,240,0.8);
+  padding: 36px 32px;
+}
+@media (max-width: 640px) {
+  .card { padding: 24px 18px; }
+  body { padding: 24px 14px 70px; }
+}
+
+.label {
+  display: block;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 10px;
+}
+
+.ta-wrap {
+  border: 1.5px solid var(--line);
+  border-radius: 16px;
+  background: var(--soft);
+  overflow: hidden;
+  transition: border 0.2s, box-shadow 0.2s, background 0.2s;
+}
+.ta-wrap:focus-within {
+  border-color: var(--primary);
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(13,148,136,0.12);
+}
+textarea {
+  width: 100%;
+  border: none;
+  outline: none;
+  resize: none;
+  background: transparent;
+  padding: 18px;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 13.5px;
+  line-height: 1.7;
+  color: var(--text);
+}
+#emailInput { height: 240px; }
+.out-ta { height: 145px; }
+
+.line-info {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 10px;
+  text-align: right;
+  font-weight: 500;
+}
+
+.btn-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 18px;
+  flex-wrap: wrap;
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 600;
+  border-radius: 12px;
+  transition: transform 0.15s, box-shadow 0.2s, background 0.2s, opacity 0.2s;
+}
+.btn:active { transform: scale(0.97); }
+
+.btn-sec {
+  padding: 13px 20px;
+  font-size: 14px;
+  background: #fff;
+  color: var(--text);
+  border: 1.5px solid var(--line);
+}
+.btn-sec:hover { background: var(--soft); border-color: #cbd5e1; }
+
+.btn-primary {
+  flex: 1;
+  min-width: 160px;
+  padding: 13px 22px;
+  font-size: 15px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #0d9488, #14b8a6);
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(13,148,136,0.3);
+}
+.btn-primary:hover {
+  box-shadow: 0 12px 28px rgba(13,148,136,0.38);
+  opacity: 0.96;
+}
+
+.btn-clear {
+  padding: 13px 18px;
+  font-size: 14px;
+  background: var(--bad-bg);
+  color: var(--bad);
+  border: 1.5px solid #fecdd3;
+}
+.btn-clear:hover { background: #ffe4e6; }
+
+.msg {
+  display: none;
+  margin-top: 16px;
+  padding: 14px 18px;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 500;
+}
+.msg.show { display: block; }
+.msg.ok { background: var(--ok-bg); color: var(--ok); border: 1px solid #a7f3d0; }
+.msg.err { background: var(--bad-bg); color: var(--bad); border: 1px solid #fecdd3; }
+.msg.info { background: var(--info-bg); color: var(--info); border: 1px solid #bae6fd; }
+
+.stats {
+  display: none;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-top: 28px;
+}
+@media (max-width: 520px) {
+  .stats { grid-template-columns: 1fr; }
+}
+.stat {
+  background: var(--soft);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 20px 12px;
+  text-align: center;
+}
+.stat-v {
+  font-size: 1.85rem;
+  font-weight: 800;
+  color: var(--primary);
+  line-height: 1.2;
+}
+.stat-l {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 6px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.results {
+  display: none;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 24px;
+}
+@media (max-width: 700px) {
+  .results { grid-template-columns: 1fr; }
+}
+.result-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(15,23,42,0.04);
+}
+.result-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  background: var(--soft);
+  border-bottom: 1px solid var(--line);
+}
+.result-title {
+  font-weight: 700;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.pill {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 999px;
+  color: #fff;
+}
+.pill-ok { background: var(--ok); }
+.pill-bad { background: var(--bad); }
+.btn-copy {
+  padding: 7px 12px;
+  font-size: 13px;
+  background: #fff;
+  color: var(--muted);
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 600;
+}
+.btn-copy:hover {
+  color: var(--primary);
+  border-color: var(--primary);
+  background: var(--primary-soft);
+}
+.result-body { padding: 12px; }
+
+.footer {
+  text-align: center;
+  margin-top: 40px;
+  font-size: 13px;
+  color: #94a3b8;
+  font-weight: 500;
+}
+</style>
+</head>
+<body>
+
+<script>
+(function(){
+  var s = null;
+  try { s = JSON.parse(localStorage.getItem('j_tools_session') || 'null'); } catch(e){}
+  if (!s || !s.email) { location.replace('index.html'); return; }
+  if (s.role !== 'admin' && s.status !== 'approved') {
+    localStorage.removeItem('j_tools_session');
+    location.replace('index.html');
+    return;
+  }
+})();
+</script>
+
+<div id="j-topbar" style="position:sticky;top:0;z-index:50;background:#0f172a;color:#fff;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;font-family:Inter,system-ui,sans-serif;font-size:13.5px;font-weight:600">
+  <a href="dashboard.html" style="color:#99f6e4;text-decoration:none">← Dashboard</a>
+  <span style="opacity:.7;font-weight:500">J-duplicate checker</span>
+  <button onclick="localStorage.removeItem('j_tools_session');location.href='index.html'" style="background:#e11d48;color:#fff;border:none;padding:7px 12px;border-radius:8px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px">Logout</button>
+</div>
+
+<div class="wrap">
+  <div class="header">
+    <div class="badge">✦ PREMIUM TOOL</div>
+    <h1>J-<span>duplicate</span> checker</h1>
+    <p>Instantly find and remove duplicate emails — passwords stay safe</p>
+  </div>
+
+  <div class="card">
+    <label class="label">Paste your email list</label>
+    <div class="ta-wrap">
+      <textarea id="emailInput" placeholder="email@gmail.com&#9;password&#10;hello@domain.com&#9;pass123&#10;email@gmail.com&#9;password&#10;..."></textarea>
+    </div>
+    <div class="line-info" id="inputCount">0 lines</div>
+
+    <div class="btn-row">
+      <button class="btn btn-sec" id="pasteBtn">Paste</button>
+      <button class="btn btn-primary" id="checkBtn">Check Duplicates</button>
+      <button class="btn btn-clear" id="clearBtn">Clear</button>
+    </div>
+
+    <div class="msg" id="messageBox"></div>
+
+    <div class="stats" id="statsBar">
+      <div class="stat">
+        <div class="stat-v" id="totalCount">0</div>
+        <div class="stat-l">Total</div>
+      </div>
+      <div class="stat">
+        <div class="stat-v" id="uniqueCount">0</div>
+        <div class="stat-l">Unique</div>
+      </div>
+      <div class="stat">
+        <div class="stat-v" id="dupCount">0</div>
+        <div class="stat-l">Duplicates</div>
+      </div>
+    </div>
+
+    <div class="results" id="resultsSection">
+      <div class="result-card">
+        <div class="result-head">
+          <div class="result-title">Unique Emails <span class="pill pill-ok" id="uniqueBadge">0</span></div>
+          <button class="btn-copy" id="copyUniqueBtn">Copy</button>
+        </div>
+        <div class="result-body">
+          <div class="ta-wrap"><textarea class="out-ta" id="uniqueList" readonly placeholder="Unique emails..."></textarea></div>
+        </div>
+      </div>
+      <div class="result-card">
+        <div class="result-head">
+          <div class="result-title">Duplicates <span class="pill pill-bad" id="dupBadge">0</span></div>
+          <button class="btn-copy" id="copyDupBtn">Copy</button>
+        </div>
+        <div class="result-body">
+          <div class="ta-wrap"><textarea class="out-ta" id="dupList" readonly placeholder="Duplicate emails..."></textarea></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">developed by gourab bro</div>
+</div>
+
+<script>
+const emailInput = document.getElementById('emailInput');
+const pasteBtn = document.getElementById('pasteBtn');
+const checkBtn = document.getElementById('checkBtn');
+const clearBtn = document.getElementById('clearBtn');
+const messageBox = document.getElementById('messageBox');
+const statsBar = document.getElementById('statsBar');
+const resultsSection = document.getElementById('resultsSection');
+const uniqueList = document.getElementById('uniqueList');
+const dupList = document.getElementById('dupList');
+const uniqueBadge = document.getElementById('uniqueBadge');
+const dupBadge = document.getElementById('dupBadge');
+const inputCount = document.getElementById('inputCount');
+const copyUniqueBtn = document.getElementById('copyUniqueBtn');
+const copyDupBtn = document.getElementById('copyDupBtn');
+
+emailInput.addEventListener('input', () => {
+  const lines = emailInput.value.split('\n').filter(l => l.trim() !== '').length;
+  inputCount.textContent = lines + (lines === 1 ? ' line' : ' lines');
+});
+
+pasteBtn.addEventListener('click', async () => {
+  try {
+    const text = await navigator.clipboard.readText();
+    emailInput.value = text;
+    emailInput.dispatchEvent(new Event('input'));
+    showMessage('Pasted from clipboard!', 'ok');
+  } catch (err) {
+    showMessage('Could not access clipboard. Paste manually (Ctrl+V).', 'err');
+  }
+});
+
+clearBtn.addEventListener('click', () => {
+  emailInput.value = '';
+  uniqueList.value = '';
+  dupList.value = '';
+  uniqueBadge.textContent = '0';
+  dupBadge.textContent = '0';
+  statsBar.style.display = 'none';
+  resultsSection.style.display = 'none';
+  inputCount.textContent = '0 lines';
+  hideMessage();
+});
+
+function extractEmail(line) {
+  var m = String(line || '').match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i);
+  return m ? m[0].toLowerCase() : null;
+}
+function toSheetsRow(line) {
+  var s = String(line || '').replace(/\r/g, '').trim();
+  if (!s) return '';
+  s = s.replace(/\t+/g, '\t');
+  if (s.indexOf('\t') >= 0) return s;
+  var parts = s.split(/\s{2,}|[|]+/).map(function(p){ return p.trim(); }).filter(Boolean);
+  if (parts.length >= 2) return parts.join('\t');
+  var m = s.match(/^(\S*@\S+)\s+(.+)$/);
+  if (m) return m[1] + '\t' + m[2];
+  return s;
+}
+function mergeBrokenLines(raw) {
+  var lines = String(raw || '').split(/\r?\n/);
+  var out = [], buf = '';
+  function hasEmail(s){ return /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i.test(s||''); }
+  for (var i=0;i<lines.length;i++){
+    var t = lines[i].replace(/\t+/g,'  ').trim();
+    if (!t) continue;
+    if (hasEmail(t)){ if(buf) out.push(buf); buf = t; }
+    else { buf = buf ? (buf + '  ' + t) : t; }
+  }
+  if (buf) out.push(buf);
+  return out;
+}
+
+checkBtn.addEventListener('click', () => {
+  const raw = emailInput.value.trim();
+  if (!raw) { showMessage('Please enter some emails first.', 'err'); return; }
+  const rows = mergeBrokenLines(raw);
+  if (!rows.length) { showMessage('No valid emails found.', 'err'); return; }
+
+  const map = {};
+  const order = [];
+  rows.forEach(function(line){
+    const em = extractEmail(line);
+    if (!em) return;
+    if (!map[em]) {
+      map[em] = { count: 0, row: toSheetsRow(line) };
+      order.push(em);
+    }
+    map[em].count += 1;
+    var cand = toSheetsRow(line);
+    if (cand.length > map[em].row.length) map[em].row = cand;
+  });
+
+  const unique = [];
+  const duplicates = [];
+  order.forEach(function(em){
+    var item = map[em];
+    if (item.count === 1) unique.push(item.row);
+    else duplicates.push(item.row + '\t×' + item.count);
+  });
+
+  uniqueList.value = unique.length ? unique.join('\n') : 'None';
+  dupList.value = duplicates.length ? duplicates.join('\n') : 'None';
+  uniqueBadge.textContent = unique.length;
+  dupBadge.textContent = duplicates.length;
+  document.getElementById('totalCount').textContent = rows.length;
+  document.getElementById('uniqueCount').textContent = unique.length;
+  document.getElementById('dupCount').textContent = duplicates.length;
+  statsBar.style.display = 'grid';
+  resultsSection.style.display = 'grid';
+
+  if (duplicates.length === 0) showMessage('Perfect! No duplicate emails found.', 'ok');
+  else showMessage('Found ' + duplicates.length + ' duplicate email(s). Passwords kept.', 'info');
+});
+
+copyUniqueBtn.addEventListener('click', () => {
+  if (!uniqueList.value || uniqueList.value === 'None') { showMessage('Nothing to copy.', 'err'); return; }
+  navigator.clipboard.writeText(uniqueList.value).then(() => {
+    showMessage('Unique emails copied!', 'ok');
+  }).catch(() => showMessage('Copy failed.', 'err'));
+});
+copyDupBtn.addEventListener('click', () => {
+  if (!dupList.value || dupList.value === 'None') { showMessage('Nothing to copy.', 'err'); return; }
+  navigator.clipboard.writeText(dupList.value).then(() => {
+    showMessage('Duplicate emails copied!', 'ok');
+  }).catch(() => showMessage('Copy failed.', 'err'));
+});
+
+function showMessage(text, type) {
+  messageBox.className = 'msg show ' + (type || 'info');
+  messageBox.textContent = text;
+  clearTimeout(window.msgTimeout);
+  window.msgTimeout = setTimeout(hideMessage, 4000);
+}
+function hideMessage() { messageBox.classList.remove('show'); }
+
+emailInput.addEventListener('keydown', (e) => {
+  if (e.ctrlKey && e.key === 'Enter') checkBtn.click();
+});
+</script>
+</body>
+</html>

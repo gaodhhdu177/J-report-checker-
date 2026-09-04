@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login · J-Tools</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f6f7fb;
+  --card: #fff;
+  --text: #0f172a;
+  --muted: #64748b;
+  --line: #e2e8f0;
+  --soft: #f1f5f9;
+  --primary: #4f46e5;
+  --primary-soft: #eef2ff;
+  --ok: #059669;
+  --bad: #e11d48;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(79,70,229,0.12), transparent);
+}
+.box {
+  width: 100%;
+  max-width: 420px;
+  background: var(--card);
+  border-radius: 24px;
+  padding: 40px 32px;
+  box-shadow: 0 8px 40px rgba(15,23,42,0.08);
+  border: 1px solid rgba(226,232,240,0.9);
+}
+.logo {
+  width: 56px; height: 56px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #4f46e5, #6366f1);
+  display: grid; place-items: center;
+  font-weight: 800; font-size: 22px; color: #fff;
+  margin: 0 auto 20px;
+  box-shadow: 0 8px 24px rgba(79,70,229,0.35);
+}
+h1 {
+  text-align: center;
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  margin-bottom: 6px;
+}
+.sub {
+  text-align: center;
+  font-size: 14px;
+  color: var(--muted);
+  margin-bottom: 28px;
+  font-weight: 500;
+}
+.label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1.5px solid var(--line);
+  border-radius: 12px;
+  background: var(--soft);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  margin-bottom: 16px;
+  transition: border 0.2s, box-shadow 0.2s, background 0.2s;
+}
+input:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(79,70,229,0.12);
+}
+.btn {
+  width: 100%;
+  padding: 15px;
+  border: none;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 15.5px;
+  font-weight: 700;
+  cursor: pointer;
+  background: linear-gradient(135deg, #4f46e5, #6366f1);
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(79,70,229,0.3);
+  transition: opacity 0.2s, transform 0.15s;
+}
+.btn:active { transform: scale(0.98); }
+.btn:hover { opacity: 0.95; }
+.msg {
+  display: none;
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-size: 13.5px;
+  font-weight: 500;
+}
+.msg.show { display: block; }
+.msg.err { background: #fff1f2; color: var(--bad); border: 1px solid #fecdd3; }
+.msg.ok { background: #ecfdf5; color: var(--ok); border: 1px solid #a7f3d0; }
+.foot {
+  text-align: center;
+  margin-top: 24px;
+  font-size: 14px;
+  color: var(--muted);
+}
+.foot a {
+  color: var(--primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+.foot a:hover { text-decoration: underline; }
+.credit {
+  text-align: center;
+  margin-top: 28px;
+  font-size: 12px;
+  color: #94a3b8;
+}
+</style>
+</head>
+<body>
+<div class="box">
+  <div class="logo">J</div>
+  <h1>Welcome back</h1>
+  <p class="sub">Sign in to access J-Tools</p>
+
+  <label class="label">Email</label>
+  <input type="email" id="email" placeholder="you@email.com" autocomplete="username">
+
+  <label class="label">Password</label>
+  <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+
+  <button class="btn" id="loginBtn">Login</button>
+  <div class="msg" id="msg"></div>
+
+  <p class="foot">No account? <a href="register.html">Register</a></p>
+  <p class="credit">developed by gourab bro</p>
+</div>
+
+<script>
+(function seedAdmin() {
+  var users = [];
+  try { users = JSON.parse(localStorage.getItem('j_tools_users') || '[]'); } catch(e) {}
+  var exists = users.some(function(u){ return (u.email || '').toLowerCase() === 'gazivai2002@gmail.com'; });
+  if (!exists) {
+    users.push({
+      id: 'admin_1',
+      email: 'gazivai2002@gmail.com',
+      password: 'J2026',
+      name: 'Admin',
+      role: 'admin',
+      status: 'approved',
+      createdAt: new Date().toISOString()
+    });
+    localStorage.setItem('j_tools_users', JSON.stringify(users));
+  }
+})();
+
+// Already logged in?
+(function(){
+  try {
+    var s = JSON.parse(localStorage.getItem('j_tools_session') || 'null');
+    if (s && s.email) {
+      if (s.role === 'admin') location.replace('admin.html');
+      else if (s.status === 'approved') location.replace('dashboard.html');
+    }
+  } catch(e){}
+})();
+
+document.getElementById('loginBtn').onclick = function() {
+  var email = document.getElementById('email').value.trim().toLowerCase();
+  var pass = document.getElementById('password').value;
+  var msg = document.getElementById('msg');
+
+  if (!email || !pass) {
+    msg.className = 'msg show err';
+    msg.textContent = 'Please enter email and password.';
+    return;
+  }
+
+  var users = [];
+  try { users = JSON.parse(localStorage.getItem('j_tools_users') || '[]'); } catch(e) {}
+
+  var user = users.find(function(u){
+    return (u.email || '').toLowerCase() === email && u.password === pass;
+  });
+
+  if (!user) {
+    msg.className = 'msg show err';
+    msg.textContent = 'Invalid email or password.';
+    return;
+  }
+
+  if (user.role !== 'admin' && user.status !== 'approved') {
+    msg.className = 'msg show err';
+    msg.textContent = 'Your account is pending. Wait for admin approval.';
+    return;
+  }
+
+  localStorage.setItem('j_tools_session', JSON.stringify({
+    id: user.id,
+    email: user.email,
+    name: user.name || user.email,
+    role: user.role || 'user',
+    status: user.status || 'approved'
+  }));
+
+  msg.className = 'msg show ok';
+  msg.textContent = 'Login successful! Redirecting...';
+
+  setTimeout(function(){
+    if (user.role === 'admin') location.href = 'admin.html';
+    else location.href = 'dashboard.html';
+  }, 600);
+};
+
+document.getElementById('password').addEventListener('keydown', function(e){
+  if (e.key === 'Enter') document.getElementById('loginBtn').click();
+});
+</script>
+</body>
+</html>
