@@ -3,17 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Register · J-Tools</title>
+<title>Register · NiBi R-1.0</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #f6f7fb;
+  --bg: #f0f4f8;
   --card: #fff;
-  --text: #0f172a;
-  --muted: #64748b;
-  --line: #e2e8f0;
-  --soft: #f1f5f9;
-  --primary: #4f46e5;
+  --text: #0c1222;
+  --muted: #5b6b7c;
+  --line: #d8e0ea;
+  --soft: #eef3f8;
+  --primary: #0f766e;
   --ok: #059669;
   --bad: #e11d48;
   --warn: #d97706;
@@ -28,7 +28,9 @@ body {
   align-items: center;
   justify-content: center;
   padding: 24px 16px;
-  background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(79,70,229,0.12), transparent);
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(15,118,110,0.14), transparent),
+    radial-gradient(ellipse 40% 30% at 100% 100%, rgba(245,158,11,0.08), transparent);
 }
 .box {
   width: 100%;
@@ -36,21 +38,22 @@ body {
   background: var(--card);
   border-radius: 24px;
   padding: 40px 32px;
-  box-shadow: 0 8px 40px rgba(15,23,42,0.08);
-  border: 1px solid rgba(226,232,240,0.9);
+  box-shadow: 0 12px 48px rgba(12,18,34,0.1);
+  border: 1px solid rgba(216,224,234,0.9);
 }
 .logo {
-  width: 56px; height: 56px;
-  border-radius: 16px;
-  background: linear-gradient(135deg, #4f46e5, #6366f1);
+  width: 60px; height: 60px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #0f766e, #14b8a6);
   display: grid; place-items: center;
-  font-weight: 800; font-size: 22px; color: #fff;
+  font-weight: 800; font-size: 18px; color: #fff;
   margin: 0 auto 20px;
-  box-shadow: 0 8px 24px rgba(79,70,229,0.35);
+  box-shadow: 0 10px 28px rgba(15,118,110,0.4);
+  letter-spacing: -0.5px;
 }
 h1 {
   text-align: center;
-  font-size: 1.6rem;
+  font-size: 1.65rem;
   font-weight: 800;
   letter-spacing: -0.5px;
   margin-bottom: 6px;
@@ -59,7 +62,7 @@ h1 {
   text-align: center;
   font-size: 14px;
   color: var(--muted);
-  margin-bottom: 28px;
+  margin-bottom: 20px;
   font-weight: 500;
 }
 .label {
@@ -84,7 +87,7 @@ input:focus {
   outline: none;
   border-color: var(--primary);
   background: #fff;
-  box-shadow: 0 0 0 4px rgba(79,70,229,0.12);
+  box-shadow: 0 0 0 4px rgba(15,118,110,0.14);
 }
 .btn {
   width: 100%;
@@ -95,9 +98,9 @@ input:focus {
   font-size: 15.5px;
   font-weight: 700;
   cursor: pointer;
-  background: linear-gradient(135deg, #4f46e5, #6366f1);
+  background: linear-gradient(135deg, #0f766e, #14b8a6);
   color: #fff;
-  box-shadow: 0 8px 24px rgba(79,70,229,0.3);
+  box-shadow: 0 8px 24px rgba(15,118,110,0.32);
 }
 .btn:hover { opacity: 0.95; }
 .msg {
@@ -142,9 +145,9 @@ input:focus {
 </head>
 <body>
 <div class="box">
-  <div class="logo">J</div>
+  <div class="logo">NR</div>
   <h1>Create account</h1>
-  <p class="sub">Register to use J-Tools</p>
+  <p class="sub">Register to use NiBi R-1.0</p>
 
   <div class="note">After registration your account stays <strong>pending</strong> until admin approves it.</div>
 
@@ -164,7 +167,7 @@ input:focus {
   <div class="msg" id="msg"></div>
 
   <p class="foot">Already have account? <a href="index.html">Login</a></p>
-  <p class="credit">developed by gourab bro</p>
+  <p class="credit">developed by Gourab bro</p>
 </div>
 
 <script>
@@ -197,7 +200,7 @@ document.getElementById('regBtn').onclick = function() {
   }
 
   var users = [];
-  try { users = JSON.parse(localStorage.getItem('j_tools_users') || '[]'); } catch(e) {}
+  try { users = JSON.parse(localStorage.getItem('nibi_r1_users') || '[]'); } catch(e) {}
 
   if (users.some(function(u){ return (u.email || '').toLowerCase() === email; })) {
     msg.className = 'msg show err';
@@ -214,7 +217,7 @@ document.getElementById('regBtn').onclick = function() {
     status: 'pending',
     createdAt: new Date().toISOString()
   });
-  localStorage.setItem('j_tools_users', JSON.stringify(users));
+  localStorage.setItem('nibi_r1_users', JSON.stringify(users));
 
   msg.className = 'msg show warn';
   msg.textContent = 'Registered! Status: Pending. Wait for admin approval, then login.';
