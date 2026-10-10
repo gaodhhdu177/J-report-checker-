@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Login · NiBi R-1.0</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+
 <style>
 :root {
   --bg: #f0f4f8;
@@ -14,11 +16,8 @@
   --line: #d8e0ea;
   --soft: #eef3f8;
   --primary: #0f766e;
-  --primary-soft: #ecfdf5;
-  --primary-dark: #0d5c56;
   --ok: #059669;
   --bad: #e11d48;
-  --accent: #f59e0b;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
@@ -53,26 +52,10 @@ body {
   box-shadow: 0 10px 28px rgba(15,118,110,0.4);
   letter-spacing: -0.5px;
 }
-h1 {
-  text-align: center;
-  font-size: 1.65rem;
-  font-weight: 800;
-  letter-spacing: -0.5px;
-  margin-bottom: 6px;
-}
-.sub {
-  text-align: center;
-  font-size: 14px;
-  color: var(--muted);
-  margin-bottom: 28px;
-  font-weight: 500;
-}
-.label {
-  display: block;
-  font-size: 13px;
-  font-weight: 600;
-  margin-bottom: 8px;
-}
+h1 { text-align: center; font-size: 1.65rem; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 6px; }
+.sub { text-align: center; font-size: 14px; color: var(--muted); margin-bottom: 12px; font-weight: 500; }
+.version { text-align: center; font-size: 11px; color: #94a3b8; margin-bottom: 20px; font-weight: 600; letter-spacing: 0.5px; }
+.label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 8px; }
 input {
   width: 100%;
   padding: 14px 16px;
@@ -107,6 +90,7 @@ input:focus {
 }
 .btn:active { transform: scale(0.98); }
 .btn:hover { opacity: 0.95; }
+.btn:disabled { opacity: 0.6; cursor: not-allowed; }
 .msg {
   display: none;
   margin-top: 14px;
@@ -118,33 +102,23 @@ input:focus {
 .msg.show { display: block; }
 .msg.err { background: #fff1f2; color: var(--bad); border: 1px solid #fecdd3; }
 .msg.ok { background: #ecfdf5; color: var(--ok); border: 1px solid #a7f3d0; }
-.foot {
-  text-align: center;
-  margin-top: 24px;
-  font-size: 14px;
-  color: var(--muted);
-}
-.foot a {
-  color: var(--primary);
-  font-weight: 600;
-  text-decoration: none;
-}
-.foot a:hover { text-decoration: underline; }
-.credit {
-  text-align: center;
-  margin-top: 28px;
-  font-size: 12px;
-  color: #94a3b8;
-}
-.version {
-  text-align: center;
-  font-size: 11px;
-  color: #94a3b8;
-  margin-top: 6px;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-}
+.foot { text-align: center; margin-top: 24px; font-size: 14px; color: var(--muted); }
+.foot a { color: var(--primary); font-weight: 600; text-decoration: none; }
+.credit { text-align: center; margin-top: 28px; font-size: 12px; color: #94a3b8; }
 </style>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+window.NIBI_CONFIG = {
+  SUPABASE_URL: 'YOUR_SUPABASE_URL',
+  SUPABASE_ANON_KEY: 'sb_publishable_cc7mD2lJfFOfKEzN0jeZUw_n7gTzx0H'
+};
+window.NIBI_SEED = {
+  admin: { email: 'nibir4550@gmail.com', password: 'Nibir5659@', name: 'Admin', role: 'admin', status: 'approved' },
+  demo:  { email: 'a-tulsdemo@gmail.com', password: 'asdF1245', name: 'Demo User', role: 'user', status: 'approved' }
+};
+</script>
+
 </head>
 <body>
 <div class="box">
@@ -167,44 +141,35 @@ input:focus {
 </div>
 
 <script>
-(function seedAccounts() {
-  var users = [];
-  try { users = JSON.parse(localStorage.getItem('nibi_r1_users') || '[]'); } catch(e) {}
+const cfg = window.NIBI_CONFIG || {};
+const sb = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
 
-  // Admin
-  var adminEmail = 'nibir4550@gmail.com';
-  var hasAdmin = users.some(function(u){ return (u.email || '').toLowerCase() === adminEmail; });
-  if (!hasAdmin) {
-    users.push({
-      id: 'admin_1',
-      email: adminEmail,
-      password: 'Nibir5659@',
-      name: 'Admin',
-      role: 'admin',
-      status: 'approved',
-      createdAt: new Date().toISOString()
-    });
-  }
+function showMsg(text, type) {
+  var msg = document.getElementById('msg');
+  msg.className = 'msg show ' + (type || 'err');
+  msg.textContent = text;
+}
 
-  // Default published demo user
-  var demoEmail = 'a-tulsdemo@gmail.com';
-  var hasDemo = users.some(function(u){ return (u.email || '').toLowerCase() === demoEmail; });
-  if (!hasDemo) {
-    users.push({
-      id: 'demo_1',
-      email: demoEmail,
-      password: 'asdF1245',
-      name: 'Demo User',
-      role: 'user',
-      status: 'approved',
-      createdAt: new Date().toISOString()
-    });
-  }
+async function seedAccounts() {
+  if (!cfg.SUPABASE_URL || cfg.SUPABASE_URL.includes('YOUR_')) return;
+  try {
+    var seeds = [window.NIBI_SEED.admin, window.NIBI_SEED.demo];
+    for (var i = 0; i < seeds.length; i++) {
+      var u = seeds[i];
+      var res = await sb.from('users').select('id').eq('email', u.email).maybeSingle();
+      if (!res.data) {
+        await sb.from('users').insert([{
+          email: u.email,
+          password: u.password,
+          name: u.name,
+          role: u.role,
+          status: u.status
+        }]);
+      }
+    }
+  } catch (e) {}
+}
 
-  localStorage.setItem('nibi_r1_users', JSON.stringify(users));
-})();
-
-// Already logged in?
 (function(){
   try {
     var s = JSON.parse(localStorage.getItem('nibi_r1_session') || 'null');
@@ -215,51 +180,62 @@ input:focus {
   } catch(e){}
 })();
 
-document.getElementById('loginBtn').onclick = function() {
+seedAccounts();
+
+document.getElementById('loginBtn').onclick = async function() {
   var email = document.getElementById('email').value.trim().toLowerCase();
   var pass = document.getElementById('password').value;
-  var msg = document.getElementById('msg');
+  var btn = document.getElementById('loginBtn');
 
   if (!email || !pass) {
-    msg.className = 'msg show err';
-    msg.textContent = 'Please enter email and password.';
+    showMsg('Please enter email and password.', 'err');
+    return;
+  }
+  if (!cfg.SUPABASE_URL || cfg.SUPABASE_URL.includes('YOUR_')) {
+    showMsg('config.js e SUPABASE_URL o KEY bosao.', 'err');
     return;
   }
 
-  var users = [];
-  try { users = JSON.parse(localStorage.getItem('nibi_r1_users') || '[]'); } catch(e) {}
+  btn.disabled = true;
+  btn.textContent = 'Logging in...';
 
-  var user = users.find(function(u){
-    return (u.email || '').toLowerCase() === email && u.password === pass;
-  });
+  try {
+    var res = await sb.from('users').select('*').eq('email', email).eq('password', pass).maybeSingle();
+    var data = res.data;
+    var error = res.error;
 
-  if (!user) {
-    msg.className = 'msg show err';
-    msg.textContent = 'Invalid email or password.';
-    return;
+    if (error) throw error;
+    if (!data) {
+      showMsg('Invalid email or password.', 'err');
+      btn.disabled = false;
+      btn.textContent = 'Login';
+      return;
+    }
+    if (data.role !== 'admin' && data.status !== 'approved') {
+      showMsg('Your account is pending. Wait for admin approval.', 'err');
+      btn.disabled = false;
+      btn.textContent = 'Login';
+      return;
+    }
+
+    localStorage.setItem('nibi_r1_session', JSON.stringify({
+      id: data.id,
+      email: data.email,
+      name: data.name || data.email,
+      role: data.role || 'user',
+      status: data.status || 'approved'
+    }));
+
+    showMsg('Login successful! Redirecting...', 'ok');
+    setTimeout(function(){
+      if (data.role === 'admin') location.href = 'admin.html';
+      else location.href = 'dashboard.html';
+    }, 500);
+  } catch (err) {
+    showMsg(err.message || 'Login failed. Check config & table.', 'err');
+    btn.disabled = false;
+    btn.textContent = 'Login';
   }
-
-  if (user.role !== 'admin' && user.status !== 'approved') {
-    msg.className = 'msg show err';
-    msg.textContent = 'Your account is pending. Wait for admin approval.';
-    return;
-  }
-
-  localStorage.setItem('nibi_r1_session', JSON.stringify({
-    id: user.id,
-    email: user.email,
-    name: user.name || user.email,
-    role: user.role || 'user',
-    status: user.status || 'approved'
-  }));
-
-  msg.className = 'msg show ok';
-  msg.textContent = 'Login successful! Redirecting...';
-
-  setTimeout(function(){
-    if (user.role === 'admin') location.href = 'admin.html';
-    else location.href = 'dashboard.html';
-  }, 600);
 };
 
 document.getElementById('password').addEventListener('keydown', function(e){

@@ -7,117 +7,50 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #f0f4f8;
-  --card: #fff;
-  --text: #0c1222;
-  --muted: #5b6b7c;
-  --line: #d8e0ea;
-  --primary: #0f766e;
-  --teal: #0d9488;
-  --amber: #f59e0b;
+  --bg: #f0f4f8; --card: #fff; --text: #0c1222; --muted: #5b6b7c;
+  --line: #d8e0ea; --primary: #0f766e;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
   font-family: 'Inter', system-ui, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-  padding: 0 0 60px;
+  background: var(--bg); color: var(--text); min-height: 100vh; padding: 0 0 60px;
   background-image:
     radial-gradient(ellipse 80% 50% at 50% -20%, rgba(15,118,110,0.1), transparent),
     radial-gradient(ellipse 40% 30% at 100% 100%, rgba(245,158,11,0.06), transparent);
 }
 .topbar {
-  background: #fff;
-  border-bottom: 1px solid var(--line);
-  padding: 14px 20px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
+  background: #fff; border-bottom: 1px solid var(--line); padding: 14px 20px;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
 }
-.brand {
-  font-weight: 800;
-  font-size: 17px;
-  letter-spacing: -0.3px;
-}
+.brand { font-weight: 800; font-size: 17px; letter-spacing: -0.3px; }
 .brand span { color: var(--primary); }
-.right {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 13.5px;
-  color: var(--muted);
-}
+.right { display: flex; align-items: center; gap: 12px; font-size: 13.5px; color: var(--muted); }
 .btn-out {
-  background: #fff1f2;
-  color: #e11d48;
-  border: 1px solid #fecdd3;
-  cursor: pointer;
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 600;
-  padding: 8px 14px;
-  border-radius: 10px;
+  background: #fff1f2; color: #e11d48; border: 1px solid #fecdd3; cursor: pointer;
+  font-family: inherit; font-size: 13px; font-weight: 600; padding: 8px 14px; border-radius: 10px;
 }
 .wrap { max-width: 800px; margin: 0 auto; padding: 36px 16px; }
-h1 {
-  font-size: clamp(1.5rem, 4vw, 1.9rem);
-  font-weight: 800;
-  letter-spacing: -0.5px;
-  margin-bottom: 8px;
-}
+h1 { font-size: clamp(1.5rem, 4vw, 1.9rem); font-weight: 800; letter-spacing: -0.5px; margin-bottom: 8px; }
 .sub { color: var(--muted); font-size: 15px; margin-bottom: 32px; }
-.grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 18px;
-}
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
 @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
 .tool {
-  display: block;
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 20px;
-  padding: 28px 24px;
-  text-decoration: none;
-  color: var(--text);
-  box-shadow: 0 4px 20px rgba(12,18,34,0.05);
-  transition: transform 0.15s, box-shadow 0.2s;
+  display: block; background: var(--card); border: 1px solid var(--line); border-radius: 20px;
+  padding: 28px 24px; text-decoration: none; color: var(--text);
+  box-shadow: 0 4px 20px rgba(12,18,34,0.05); transition: transform 0.15s, box-shadow 0.2s;
 }
-.tool:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 32px rgba(12,18,34,0.1);
-}
+.tool:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(12,18,34,0.1); }
 .tool-icon {
-  width: 48px; height: 48px;
-  border-radius: 14px;
-  display: grid; place-items: center;
-  font-weight: 800; font-size: 16px; color: #fff;
-  margin-bottom: 16px;
+  width: 48px; height: 48px; border-radius: 14px; display: grid; place-items: center;
+  font-weight: 800; font-size: 16px; color: #fff; margin-bottom: 16px;
 }
 .tool:nth-child(1) .tool-icon { background: linear-gradient(135deg, #0f766e, #14b8a6); }
 .tool:nth-child(2) .tool-icon { background: linear-gradient(135deg, #b45309, #f59e0b); }
 .tool h2 { font-size: 1.15rem; font-weight: 800; margin-bottom: 6px; }
 .tool p { font-size: 13.5px; color: var(--muted); line-height: 1.5; }
-.admin-link {
-  display: none;
-  margin-top: 24px;
-  text-align: center;
-}
-.admin-link a {
-  color: var(--primary);
-  font-weight: 600;
-  text-decoration: none;
-  font-size: 14px;
-}
-.credit {
-  text-align: center;
-  margin-top: 40px;
-  font-size: 12px;
-  color: #94a3b8;
-}
+.admin-link { display: none; margin-top: 24px; text-align: center; }
+.admin-link a { color: var(--primary); font-weight: 600; text-decoration: none; font-size: 14px; }
+.credit { text-align: center; margin-top: 40px; font-size: 12px; color: #94a3b8; }
 </style>
 </head>
 <body>
@@ -132,7 +65,6 @@ h1 {
 <div class="wrap">
   <h1>Dashboard</h1>
   <p class="sub">Choose a tool to continue</p>
-
   <div class="grid">
     <a class="tool" href="nabir-report-zone.html">
       <div class="tool-icon">NR</div>
@@ -145,11 +77,9 @@ h1 {
       <p>Find and remove duplicate emails — passwords stay safe</p>
     </a>
   </div>
-
   <div class="admin-link" id="adminLink">
     <a href="admin.html">→ Open Admin Panel</a>
   </div>
-
   <p class="credit">developed by Gourab bro</p>
 </div>
 
@@ -157,19 +87,14 @@ h1 {
 (function guard(){
   var s = null;
   try { s = JSON.parse(localStorage.getItem('nibi_r1_session') || 'null'); } catch(e){}
-  if (!s || !s.email) {
-    location.replace('index.html');
-    return;
-  }
+  if (!s || !s.email) { location.replace('index.html'); return; }
   if (s.role !== 'admin' && s.status !== 'approved') {
     localStorage.removeItem('nibi_r1_session');
     location.replace('index.html');
     return;
   }
   document.getElementById('userLabel').textContent = s.name || s.email;
-  if (s.role === 'admin') {
-    document.getElementById('adminLink').style.display = 'block';
-  }
+  if (s.role === 'admin') document.getElementById('adminLink').style.display = 'block';
 })();
 
 document.getElementById('logoutBtn').onclick = function(){
